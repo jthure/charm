@@ -146,8 +146,8 @@ else:
 
 _charm_version = opt.get('VERSION')
 lib_config_file = 'charm/config.py'
-inc_dirs = [s[2:] for s in opt.get('CHARM_CFLAGS').split() if s.startswith('-I')]
-library_dirs = [s[2:] for s in opt.get('LDFLAGS').split() if s.startswith('-L')]
+inc_dirs = [s[2:] for s in opt.get('CHARM_CFLAGS').split() if s.startswith('-I')] + [s[2:] for s in opt.get('PY_CFLAGS').split() if s.startswith('-I')]
+library_dirs = [s[2:] for s in opt.get('LDFLAGS').split() if s.startswith('-L')] + [s[2:] for s in opt.get('PY_LDFLAGS').split() if s.startswith('-L')]
 runtime_library_dirs = [s[11:] for s in opt.get('LDFLAGS').split()
                         if s.lower().startswith('-wl,-rpath,')]
 if opt.get('PAIR_MOD') == 'yes':
@@ -158,7 +158,7 @@ if opt.get('PAIR_MOD') == 'yes':
                                             benchmark_path] + inc_dirs,
                             sources = [math_path+'pairing/pairingmodule.c', 
                                         utils_path+'base64.c'],
-                            libraries=['pbc', 'gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
+                            libraries=['pbc', 'gmp', 'crypto', 'python3.6m'], define_macros=_macros, undef_macros=_undef_macro,
                             library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
 
     elif opt.get('USE_RELIC') == 'yes':
@@ -173,7 +173,7 @@ if opt.get('PAIR_MOD') == 'yes':
                             sources = [math_path + 'pairing/relic/pairingmodule3.c',
                                         math_path + 'pairing/relic/relic_interface.c',
                                         utils_path + 'base64.c'],
-                            libraries=['relic', 'gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
+                            libraries=['relic', 'gmp', 'crypto', 'python3.6m'], define_macros=_macros, undef_macros=_undef_macro,
                             library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
                             #extra_objects=[relic_lib], extra_compile_args=None)
 
@@ -188,7 +188,7 @@ if opt.get('PAIR_MOD') == 'yes':
                                             benchmark_path, miracl_inc],
                             sources = [math_path + 'pairing/miracl/pairingmodule2.c',
                                         math_path + 'pairing/miracl/miracl_interface2.cc'],
-                            libraries=['gmp', 'crypto', 'stdc++'], define_macros=_macros, undef_macros=_undef_macro,
+                            libraries=['gmp', 'crypto', 'stdc++', 'python3.6m'], define_macros=_macros, undef_macros=_undef_macro,
                             extra_objects=[miracl_lib], extra_compile_args=None,
                             library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
 
@@ -201,7 +201,7 @@ if opt.get('INT_MOD') == 'yes':
                                             benchmark_path] + inc_dirs,
                             sources = [math_path + 'integer/integermodule.c', 
                                         utils_path + 'base64.c'], 
-                            libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
+                            libraries=['gmp', 'crypto', 'python3.6m'], define_macros=_macros, undef_macros=_undef_macro,
                             library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
    _ext_modules.append(integer_module)
    
@@ -212,11 +212,16 @@ if opt.get('ECC_MOD') == 'yes':
                                 benchmark_path] + inc_dirs,
 				sources = [math_path + 'elliptic_curve/ecmodule.c',
                             utils_path + 'base64.c'], 
-				libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
+				libraries=['gmp', 'crypto', 'python3.6m'], define_macros=_macros, undef_macros=_undef_macro,
                 library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
    _ext_modules.append(ecc_module)
 
-benchmark_module = Extension(core_prefix + '.benchmark', sources = [benchmark_path + 'benchmarkmodule.c'])
+benchmark_module = Extension(core_prefix + '.benchmark',
+                sources = [benchmark_path + 'benchmarkmodule.c'],
+                include_dirs=inc_dirs,
+                library_dirs=library_dirs,
+                libraries=['python3.6m'],
+                runtime_library_dirs=runtime_library_dirs)
 
 cryptobase = Extension(crypto_prefix+'.cryptobase', sources = [cryptobase_path + 'cryptobasemodule.c'])
 
