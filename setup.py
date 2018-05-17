@@ -223,22 +223,35 @@ benchmark_module = Extension(core_prefix + '.benchmark',
                 libraries=['python3.6m'],
                 runtime_library_dirs=runtime_library_dirs)
 
-cryptobase = Extension(crypto_prefix+'.cryptobase', sources = [cryptobase_path + 'cryptobasemodule.c'])
+cryptobase = Extension(crypto_prefix+'.cryptobase', sources = [cryptobase_path + 'cryptobasemodule.c'],
+                    include_dirs = [cryptobase_path]+inc_dirs,
+                    library_dirs=library_dirs,
+                    libraries=['python3.6m'],
+                    runtime_library_dirs=runtime_library_dirs)
 
 aes = Extension(crypto_prefix + '.AES',
-                    include_dirs = [cryptobase_path],
-                    sources = [crypto_path + 'AES/AES.c'])
+                    include_dirs = [cryptobase_path]+inc_dirs,
+                    sources = [crypto_path + 'AES/AES.c'],
+                    library_dirs=library_dirs,
+                    libraries=['python3.6m'],
+                    runtime_library_dirs=runtime_library_dirs)
 
 des  = Extension(crypto_prefix + '.DES',
                     include_dirs = [cryptobase_path + 'libtom/',
-                                    cryptobase_path],
-                    sources = [crypto_path + 'DES/DES.c'])
+                                    cryptobase_path] + inc_dirs,
+                    sources = [crypto_path + 'DES/DES.c'],
+                    library_dirs=library_dirs,
+                    libraries=['python3.6m'],
+                    runtime_library_dirs=runtime_library_dirs)
 
 des3  = Extension(crypto_prefix + '.DES3',
                     include_dirs = [cryptobase_path + 'libtom/',
                                     cryptobase_path,
-                                    crypto_path + 'DES/'], 
-                    sources = [crypto_path + 'DES3/DES3.c'])
+                                    crypto_path + 'DES/'] + inc_dirs, 
+                    sources = [crypto_path + 'DES3/DES3.c'],
+                    library_dirs = library_dirs,
+                    libraries=['python3.6m'],
+                    runtime_library_dirs=runtime_library_dirs)
 
 _ext_modules.extend([benchmark_module, cryptobase, aes, des, des3])
 #_ext_modules.extend([cryptobase, aes, des, des3])
