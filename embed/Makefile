@@ -19,11 +19,6 @@ test: ${OBJECTS}
 charm_embed_api.o: charm_embed_api.c
 	${CC} ${CFLAGS} $(OPTS) -c charm_embed_api.c
 
-charm_embed_api_shared.o: charm_embed_api.c
-	${CC} ${CFLAGS} $(OPTS) -c -fPIC -o charm_embed_api_shared.o charm_embed_api.c
-
-libcharm.so: charm_embed_api_shared.o
-	${CC} ${CFLAGS} $(OPTS) -shared -fPIC -Wl,-soname,libcharm.so.1 -o libcharm.so.1.0.0 charm_embed_api_shared.o -lc
 test.o: test.c
 	${CC} ${CFLAGS} $(OPTS) test.c -c 
 
